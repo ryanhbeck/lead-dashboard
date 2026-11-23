@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lead Source Dashboard | Superior One Roofing</title>
+<style>
+:root{--bg:#f5f6f8;--card:#fff;--fg:#14181f;--mut:#667085;--line:#e4e7ec;--acc:#1d5fd1;--ok:#17803d;--warn:#b45309;--hot:#c0262d;--track:#e9ecf1}
+@media(prefers-color-scheme:dark){:root{--bg:#0e1116;--card:#171b22;--fg:#eef1f6;--mut:#98a2b3;--line:#262c36;--acc:#5b9bff;--ok:#3fb868;--warn:#e8a03a;--hot:#ff6b6b;--track:#262c36}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:1100px;margin:0 auto;padding:24px 16px 56px}
+header{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+h1{font-size:26px;margin:0;letter-spacing:-.02em}.sub{color:var(--mut);font-size:13px}
+.badge{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-size:12.5px;color:var(--warn);font-weight:600}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:14px 0}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.kpi .n{font-size:24px;font-weight:700;font-variant-numeric:tabular-nums}.kpi .l{font-size:11.5px;color:var(--mut);text-transform:uppercase;letter-spacing:.06em}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+h2{font-size:16px;margin:0 0 2px}.hint{color:var(--mut);font-size:12.5px;margin-bottom:12px}
+.row{display:grid;grid-template-columns:150px 1fr 70px;gap:10px;align-items:center;margin:8px 0;font-size:13.5px}
+.track{position:relative;height:18px;background:var(--track);border-radius:5px;overflow:hidden}
+.track i{position:absolute;left:0;top:0;bottom:0;border-radius:5px}
+.val{text-align:right;font-variant-numeric:tabular-nums;color:var(--mut)}
+.legend{display:flex;gap:14px;font-size:12px;color:var(--mut);margin-bottom:6px;flex-wrap:wrap}.legend b{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.goal{position:absolute;top:-2px;bottom:-2px;width:2px;background:var(--fg);opacity:.7}
+table{width:100%;border-collapse:collapse;font-size:13.5px;font-variant-numeric:tabular-nums}
+th,td{padding:9px 8px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}th:first-child,td:first-child{text-align:left}
+th{color:var(--mut);font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;font-weight:600}
+.scroll{overflow-x:auto}select{font:inherit;background:var(--card);color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:6px 10px}
+.ins{margin:0;padding-left:18px}.ins li{margin:6px 0}
+.ok{color:var(--ok)}.warn{color:var(--warn)}.hot{color:var(--hot)}
+@media(max-width:560px){.row{grid-template-columns:100px 1fr 56px}}
+</style></head><body><div class="wrap">
+<header><div><h1>Lead Source Dashboard</h1><div class="sub">Superior One Roofing &middot; Last 30 days &middot; where leads come from, how fast we respond, and what they turn into</div></div>
+<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span class="badge">SAMPLE DATA &middot; prototype</span><label class="sub">Sort by <select id="sort"><option value="l">Leads</option><option value="r">Revenue</option><option value="cr">Lead-to-close rate</option><option value="rpl">Revenue per lead</option><option value="t">Speed to lead</option></select></label></div></header>
+<div class="kpis" id="kpis"></div>
+<div class="card"><h2>Lead funnel by source</h2><div class="hint">Bar length is relative to the biggest source.</div>
+<div class="legend"><span><b style="background:var(--track);border:1px solid var(--line)"></b>Leads</span><span><b style="background:var(--acc)"></b>Appointments set</span><span><b style="background:var(--ok)"></b>Closed jobs</span></div><div id="funnel"></div></div>
+<div class="card"><h2>Speed to lead</h2><div class="hint">Median minutes to first human contact. The line marks the 5-minute goal.</div><div id="speed"></div></div>
+<div class="card"><h2>Source scorecard</h2><div class="hint">Cost and return by source. Referral payouts count as spend.</div><div class="scroll"><table id="tbl"></table></div></div>
+<div class="card"><h2>What stands out</h2><ul class="ins" id="ins"></ul></div>
+<div class="sub">All numbers on this page are made-up sample data for presentation. No customer information is included.</div>
+</div>
+<script>
+var D=[
+{n:"Referral partners",l:64,a:38,c:17,s:1900,r:224000,t:9},
+{n:"Google Ads / Search",l:118,a:52,c:16,s:6400,r:168000,t:12},
+{n:"Phone (direct call)",l:47,a:20,c:6,s:0,r:82000,t:3},
+{n:"Thumbtack",l:96,a:31,c:7,s:4100,r:71000,t:41},
+{n:"Website form",l:58,a:21,c:6,s:0,r:69000,t:18},
+{n:"Social media",l:29,a:6,c:1,s:800,r:14000,t:55},
+{n:"AI search (ChatGPT)",l:8,a:2,c:0,s:600,r:0,t:30}];
+D.forEach(function(d){d.cr=d.c/d.l;d.rpl=d.r/d.l;d.cpl=d.s/d.l;d.cac=d.c?d.s/d.c:null;d.roas=d.s?d.r/d.s:null});
+function $(i){return document.getElementById(i)}
+function money(x){return x==null?"n/a":"$"+Math.round(x).toLocaleString()}
+function pct(x){return (x*100).toFixed(1)+"%"}
+function sum(k){return D.reduce(function(a,d){return a+d[k]},0)}
+function render(){
+ var k=$("sort").value,rows=D.slice().sort(function(a,b){return k=="t"?a.t-b.t:b[k]-a[k]});
+ var L=sum("l"),A=sum("a"),C=sum("c"),S=sum("s"),R=sum("r");
+ var med=D.map(function(d){return d.t}).sort(function(a,b){return a-b})[3];
+ $("kpis").innerHTML=[["Leads",L],["Appointments",A],["Closed jobs",C],["Lead-to-close",pct(C/L)],["Revenue",money(R)],["Revenue per lead",money(R/L)],["Cost per closed job",money(S/C)],["Median speed to lead",med+" min"]].map(function(x){return '<div class="kpi"><div class="n">'+x[1]+'</div><div class="l">'+x[0]+'</div></div>'}).join("");
+ var mx=Math.max.apply(null,D.map(function(d){return d.l}));
+ $("funnel").innerHTML=rows.map(function(d){return '<div class="row"><div>'+d.n+'</div><div class="track"><i style="width:'+d.l/mx*100+'%;background:var(--line)"></i><i style="width:'+d.a/mx*100+'%;background:var(--acc);opacity:.9"></i><i style="width:'+d.c/mx*100+'%;background:var(--ok)"></i></div><div class="val">'+d.l+' / '+d.a+' / '+d.c+'</div></div>'}).join("");
+ $("speed").innerHTML=rows.map(function(d){var c=d.t<=5?"var(--ok)":d.t<=15?"var(--warn)":"var(--hot)";return '<div class="row"><div>'+d.n+'</div><div class="track"><i style="width:'+Math.min(d.t,60)/60*100+'%;background:'+c+'"></i><span class="goal" style="left:'+5/60*100+'%"></span></div><div class="val">'+d.t+' min</div></div>'}).join("");
+ $("tbl").innerHTML='<tr><th>Source</th><th>Leads</th><th>Appts</th><th>Closed</th><th>Close rate</th><th>Spend</th><th>Cost / lead</th><th>Cost / job</th><th>Revenue</th><th>Rev / lead</th><th>ROAS</th></tr>'+rows.map(function(d){return '<tr><td>'+d.n+'</td><td>'+d.l+'</td><td>'+d.a+'</td><td>'+d.c+'</td><td>'+pct(d.cr)+'</td><td>'+money(d.s)+'</td><td>'+money(d.cpl)+'</td><td>'+money(d.cac)+'</td><td>'+money(d.r)+'</td><td>'+money(d.rpl)+'</td><td>'+(d.roas==null?"n/a":d.roas.toFixed(1)+"x")+'</td></tr>'}).join("")+'<tr style="font-weight:700"><td>Total</td><td>'+L+'</td><td>'+A+'</td><td>'+C+'</td><td>'+pct(C/L)+'</td><td>'+money(S)+'</td><td>'+money(S/L)+'</td><td>'+money(S/C)+'</td><td>'+money(R)+'</td><td>'+money(R/L)+'</td><td>'+(R/S).toFixed(1)+'x</td></tr>';
+ var best=D.slice().sort(function(a,b){return b.rpl-a.rpl})[0],slow=D.slice().sort(function(a,b){return b.t-a.t})[0],big=D.slice().sort(function(a,b){return b.l-a.l})[0],dead=D.filter(function(d){return d.c==0&&d.s>0})[0];
+ var q=D.filter(function(d){return d.n.indexOf("Thumbtack")==0})[0];
+ $("ins").innerHTML='<li><b class="ok">'+best.n+'</b> brings the most revenue per lead ('+money(best.rpl)+') at a '+pct(best.cr)+' close rate. It is the best place to grow.</li>'
+ +'<li><b>'+big.n+'</b> sends the most leads ('+big.l+'), but only '+pct(big.cr)+' close, so it is volume more than quality.</li>'
+ +'<li><b class="hot">'+slow.n+'</b> is slowest to first contact at '+slow.t+' minutes against a 5-minute goal. Slow response costs the most on paid and marketplace leads.</li>'
+ +'<li><b class="warn">'+q.n+'</b> costs '+money(q.cpl)+' per lead and '+money(q.cac)+' per closed job, with a median response of '+q.t+' minutes.</li>'
+ +(dead?'<li><b class="hot">'+dead.n+'</b> has '+money(dead.s)+' of spend and no closed jobs yet. Confirm tracking before spending more.</li>':'');
+}
+$("sort").onchange=render;render();
+</script></body></html>
